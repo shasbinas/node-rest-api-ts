@@ -2,12 +2,12 @@
   "name": "rest-api-ts",
   "version": "1.0.0",
   "description": "",
-  "type": "commonjs",
   "main": "dist/server.js",
+  "type": "module",
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "nodemon --watch src --exec ts-node src/server.ts",
-    "build": "tsc"
+    "dev": "nodemon --watch src --exec ts-node-esm src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "repository": {
     "type": "git",
