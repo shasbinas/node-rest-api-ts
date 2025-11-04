@@ -1,32 +1,29 @@
-import { Pool } from "pg";
+import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const connectDB = async () => {
+const connectDB = async (): Promise<void> => {
   try {
-    const { PG_USER, PG_HOST, PG_PASSWORD, PG_PORT, PG_DATABASE } = process.env;
+    const mongoUri = process.env.MONGO_URI as string;
+    const dbName = process.env.DATABASE;
 
-    if (!PG_USER || !PG_HOST || !PG_DATABASE || !PG_PASSWORD) {
-      throw new Error("❌ Missing PostgreSQL environment variables in .env");
+    if (!mongoUri) {
+      throw new Error("MONGO_URI not defined in .env");
     }
 
-    const pool = new Pool({
-      user: PG_USER,
-      host: PG_HOST,
-      database: PG_DATABASE,
-      password: PG_PASSWORD,
-      port: Number(PG_PORT),
+    const conn = await mongoose.connect(mongoUri, {
+      dbName, // ✅ explicitly choose which DB to use (optional)
     });
 
-    const client = await pool.connect();
-    console.log(`✅ PostgreSQL Connected: ${PG_HOST}:${PG_PORT}`);
-    console.log(`📂 Using Database: ${PG_DATABASE}`);
-    client.release();
-
-    return pool;
-  } catch (error: any) {
-    console.error(`❌ PostgreSQL Connection Error: ${error.message}`);
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`📂 Using Database: ${conn.connection.name}`);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(`❌ Error: ${error.message}`);
+    } else {
+      console.error("❌ Unknown error connecting to MongoDB");
+    }
     process.exit(1);
   }
 };

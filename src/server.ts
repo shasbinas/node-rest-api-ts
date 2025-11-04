@@ -1,20 +1,21 @@
-import express from "express";
+import express, { Application, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
-import connectDB from "./config/db"; // PostgreSQL connection
-// import authRoutes from "./routes/authRoutes";
-// import userRoutes from "./routes/userRoutes";
-// import productRoutes from "./routes/productRoutes";
-// import studentRoutes from "./routes/studentRoutes";
-// import { errorHandler } from "./middleware/errorMiddleware";
+import connectDB from "./config/db"; // ✅ No .js extension in TS imports
+
+import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
+import productRoutes from "./routes/productRoutes";
+import studentRoutes from "./routes/studentRoutes";
+import { errorHandler } from "./middleware/errorMiddleware";
 
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 9000;
+const app: Application = express();
+const PORT = process.env.PORT || 3000;
 
-// Middleware
+// ✅ Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,19 +23,26 @@ app.use(cors());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
-// Database connection
+
+
+// ✅ Connect to MongoDB
 connectDB();
 
-// Routes
-// app.use("/api", authRoutes);
-// app.use("/api/users", userRoutes);
-// app.use("/api/products", productRoutes);
-// app.use("/api/students", studentRoutes);
+// ✅ Routes
+app.use("/api", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/students", studentRoutes);
 
-// Error Handler
-// app.use(errorHandler);
+// ✅ Example test route (optional)
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello from TypeScript server 👋");
+});
 
-// Server Start
+// ✅ Error handler
+app.use(errorHandler as unknown as (err: any, req: Request, res: Response, next: NextFunction) => void);
+
+// ✅ Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT} (PID: ${process.pid})`);
+  console.log(`🚀 Process ID ${process.pid}: Server running on PORT ${PORT} in ${process.env.NODE_ENV} mode`);
 });
